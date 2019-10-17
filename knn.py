@@ -5,6 +5,7 @@ import operator
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.model_selection import train_test_split
+from sklearn.metrics import f1_score
 import os
 import time
 import numpy as np
@@ -31,18 +32,18 @@ def loadDataset(filename, split, trainingSet=[], testSet=[]):
 '''
 
 def loadDataset(filename):
-	with open(filename, 'r') as csvfile:
-		lines = csv.reader(csvfile)
+	#with open(filename, 'r') as csvfile:
+		#lines = csv.reader(csvfile)
         
-		dataset = ( pd.DataFrame(list(lines)) )[:][1:]    #remove column labels (first row)
+		#dataset = ( pd.DataFrame(list(lines)) )[:][1:]    #remove column labels (first row)
+		dataset=pd.read_csv(filename)
 		if len(dataset.columns)==38:
 		    dataset=dataset.drop(dataset.columns[15:],axis=1) #drop all cols after class column
 		    dataset=dataset.drop(dataset.columns[13],axis=1) #drop fuv
-		    y=dataset[14]
 		else:
 		    dataset=dataset.drop(dataset.columns[14:],axis=1)
-		    y=dataset[13]
-		    
+		
+		y=dataset['class']    
 		dataset=dataset.drop(dataset.columns[0:2],axis=1) #drop id cols
 		x=dataset.drop(dataset.columns[11],axis=1) #drop class col (after previous drops, its col index is 11
 		
@@ -86,14 +87,14 @@ def getResponse(neighbors):
 			classVotes[response] = 1
 	sortedVotes = sorted(classVotes.items(), key=operator.itemgetter(1), reverse=True)
 	return sortedVotes[0][0]
-
+'''
 def getAccuracy(testSety, predictions):
 	correct = 0
 	for x in range(len(testSety)):
 		if testSety[x] == predictions[x]:
 			correct += 1
 	return (correct/float(len(testSety))) * 100.0
-	
+'''	
 def kNN(Setx, Sety, trainingSetx, trainingSety, k):
     predictions=[]
     for x in range(len(Setx)):	#runs the number of times the amount of values in the test data set
@@ -101,8 +102,9 @@ def kNN(Setx, Sety, trainingSetx, trainingSety, k):
         result = getResponse(neighbors)
         predictions.append(result)
         #print('> predicted=' + repr(result) + ', actual=' + repr(testSet[x][-1]))
-    accuracy = getAccuracy(Sety, predictions)
-    return accuracy
+    #accuracy = getAccuracy(Sety, predictions)
+    fscore=f1_score(Sety.tolist(),predictions)*100.0
+    return fscore
 
 def main():
     # prepare data
@@ -129,11 +131,11 @@ def main():
                 if accuracy>bestacc:
                     bestk=k
                     bestacc=accuracy
-                print("k=",k,"\taccuracy=",accuracy,'%')
+                print("k=",k,"\tf1 score=",accuracy,'%')
             
             print("Best k=", bestk,"\n")
             accuracy = kNN(reportSetx,reportSety, trainingSetx, trainingSety, bestk)
-            print('Reported accuracy: ' + repr(accuracy) + '%\n\n')
+            print('Reported f1 score: ' + repr(accuracy) + '%\n\n')
             print('Time elapsed:', time.time()-inittime)
 	    
 main()
