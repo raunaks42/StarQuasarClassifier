@@ -33,12 +33,17 @@ def loadDataset(filename, split, trainingSet=[], testSet=[]):
 def loadDataset(filename):
 	with open(filename, 'r') as csvfile:
 		lines = csv.reader(csvfile)
-
+        
 		dataset = ( pd.DataFrame(list(lines)) )[:][1:]    #remove column labels (first row)
-		dataset=dataset.drop(dataset.columns[15:],axis=1) #drop all cols after class column
-		dataset=dataset.drop(dataset.columns[13],axis=1) #drop fuv
+		if len(dataset.columns)==38:
+		    dataset=dataset.drop(dataset.columns[15:],axis=1) #drop all cols after class column
+		    dataset=dataset.drop(dataset.columns[13],axis=1) #drop fuv
+		    y=dataset[14]
+		else:
+		    dataset=dataset.drop(dataset.columns[14:],axis=1)
+		    y=dataset[13]
+		    
 		dataset=dataset.drop(dataset.columns[0:2],axis=1) #drop id cols
-		y=dataset[14]
 		x=dataset.drop(dataset.columns[11],axis=1) #drop class col (after previous drops, its col index is 11
 		
 		sc = MinMaxScaler(feature_range=(0, 1))
@@ -106,10 +111,10 @@ def main():
     print('Train file: cat1.csv')
     print ('Train set size: ' + repr(len(trainingSetx)),'\n\n')
     inittime=time.time()
-    filenames=['cat1_r1.csv','cat1_r2.csv','cat1_r3.csv']
-    #for File in os.listdir(direc):  #each file in directory
-        #filename=os.fsdecode(File)  #get filename
-    for filename in filenames:
+    #filenames=['cat1_r1.csv','cat1_r2.csv','cat1_r3.csv']
+    for File in os.listdir(direc):  #each file in directory
+        filename=os.fsdecode(File)  #get filename
+    #for filename in filenames:
         if filename.endswith('.csv'):
             testSetx,testSety=loadDataset(filename)
             #split = 0.67
@@ -119,7 +124,7 @@ def main():
             
             bestk=1
             bestacc=0
-            for k in range(1,16,2):
+            for k in range(1,32,2):
                 accuracy = kNN(cvSetx, cvSety, trainingSetx, trainingSety, k)
                 if accuracy>bestacc:
                     bestk=k
