@@ -1,3 +1,4 @@
+
 import pandas as pd
 import numpy as np
 from sklearn.preprocessing import MinMaxScaler
@@ -10,23 +11,27 @@ import warnings
 warnings.filterwarnings('ignore')
 
 def loadDataset(filename):
-		dataset=pd.read_csv(filename)
+        dataset=pd.read_csv(filename)
 		
-		if len(dataset.columns)==38:
-		    dataset=dataset.drop(dataset.columns[15:],axis=1) #drop all cols after class column
-		    dataset=dataset.drop(dataset.columns[13],axis=1) #drop fuv
-		else:   #31 cols, ie, all catalog 4 csvs
-		    dataset=dataset.drop(dataset.columns[14:],axis=1) #drop all after class
-		   
-		dataset=dataset.drop(dataset.columns[0:2],axis=1) #drop id cols
-		y=dataset['class']
-		x=dataset.drop(dataset.columns[11],axis=1) #drop class col (after previous drops, its col index is 11
+        if len(dataset.columns)==38:
+            dataset=dataset.drop(dataset.columns[31:],axis=1) #drop all cols after class column
+            y=dataset['class']
+            dataset=dataset.drop(dataset.columns[13:16],axis=1) #drop fuv
+            x=dataset.drop(dataset.columns[0:7],axis=1)
+        else:   #31 cols, ie, all catalog 4 csvs
+            dataset=dataset.drop(dataset.columns[30:],axis=1) #drop all after class
+            y=dataset['class']
+            dataset=dataset.drop(dataset.columns[13:15],axis=1)
+            x=dataset.drop(dataset.columns[0:7],axis=1)
+        # dataset=dataset.drop(dataset.columns[0:2],axis=1) #drop id cols
+        # y=dataset['class']
+        # x=dataset.drop(dataset.columns[11],axis=1) #drop class col (after previous drops, its col index is 11
 		
-		sc = MinMaxScaler(feature_range=(0, 1))
-		x = sc.fit_transform(x) #scale x vals
-		y = y.to_numpy()    #convert y to numpy array
+        sc = MinMaxScaler(feature_range=(0, 1))
+        x = sc.fit_transform(x) #scale x vals
+        y = y.to_numpy()    #convert y to numpy array
 		
-		return x,y
+        return x,y
 
 def getNeighbors(trainingSetx, trainingSety, testInstance, k):
 	distances = []
@@ -58,15 +63,15 @@ def kNN(Setx, Sety, trainingSetx, trainingSety, k):
     return f1_score(Sety.tolist(),predictions)*100.0    #sety.tolist() converts numpy array to list
 
 def main():
-    direc=os.fsencode('.')  #encode current directory
+    #direc=os.fsencode('.')  #encode current directory
     
-    trainingSetx,trainingSety=loadDataset('cat1.csv')   #load training data
-    print('Train file: cat1.csv')
+    trainingSetx,trainingSety=loadDataset('cat3.csv')   #load training data
+    print('Train file: cat3.csv')
     print ('Train set size: ' + repr(len(trainingSetx)),'\n\n')
     
     inittime=time.time()
     
-    filenames=['cat1_r1.csv','cat1_r2.csv','cat1_r3.csv']
+    filenames=['cat3.csv','cat3_r1.csv','cat3_r2.csv','cat3_r3.csv']
     for filename in filenames:
     #for File in os.listdir(direc):  #each file in directory
         #filename=os.fsdecode(File)  #get filename
