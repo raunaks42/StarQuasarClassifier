@@ -46,7 +46,7 @@ def manhattanDistance(instance1, instance2):
 	return np.sum(np.absolute(instance1-instance2)) #element wise subtraction, element wise absolute, sum of elements
 
 def getResponse(neighbors):
-	classVotes = {0:0,1:0}  #votes of class 0 and class 1
+	classVotes = [0,0]  #votes of class 0 and class 1
 	for x in range(len(neighbors)):
 		response = neighbors[x]  #y value of neighbor training example
 		classVotes[response] += 1
@@ -62,14 +62,14 @@ def kNN(Setx, Sety, trainingSetx, trainingSety, k):
     return f1_score(Sety.tolist(),predictions,average='weighted')*100.0 , predictions    #sety.tolist() converts numpy array to list
 
 def main():
-    # direc=os.fsencode('.')  #encode current directory
+    direc=os.fsencode('.')  #encode current directory
 
     inittime=time.time()
 
-    filenames=['cat2.csv','cat2_r1.csv','cat2_r2.csv','cat2_r3.csv']
-    for filename in filenames:
-    # for File in os.listdir(direc):  #each file in directory
-    #     filename=os.fsdecode(File)  #get filename
+    #filenames=['cat2.csv','cat2_r1.csv','cat2_r2.csv','cat2_r3.csv']
+    #for filename in filenames:
+    for File in os.listdir(direc):  #each file in directory
+        filename=os.fsdecode(File)  #get filename
         if filename.endswith('.csv'):
             #testSetx,testSety=loadDataset(filename) #load test data
             totSetx,totSety=loadDataset(filename)
@@ -93,10 +93,17 @@ def main():
 
             totSetx,totSety=loadDataset(filename,True)
             trainingSetx,testSetx,trainingSety,testSety=train_test_split(totSetx,totSety, test_size = 0.25, random_state = 69)
-            accuracy, predictedRedShift = kNN(testSetx, testSety, trainingSetx, trainingSety, 5)
-            print('Crossvalidated acc=',f1_score(predictedModel,predictedRedShift)*100.0,'%\n')
+            predictedRedShift=[]
+            for i in testSetx:
+                if i>=0.004:
+                    predictedRedShift.append(1)
+                else:
+                    predictedRedShift.append(0)
+            #accuracy, predictedRedShift = kNN(testSetx, testSety, trainingSetx, trainingSety, 5)
+            print('Crossvalidated acc=',f1_score(predictedModel,predictedRedShift,average='weighted')*100.0,'%\n')
 
 
     print('Total time elapsed:', time.time()-inittime)
 
 main()
+
