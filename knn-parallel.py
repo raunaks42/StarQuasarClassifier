@@ -35,14 +35,14 @@ def loadDataset(filename, crossVal=False):
 
 def getNeighbors(trainingSetx, trainingSety, testInstance, k):
     distances = []
-    futures=[]
-    with ProcessPoolExecutor(8) as executor:
-        for x in range(len(trainingSetx)):
-            futures.append(executor.submit(manhattanDistance, testInstance,trainingSetx[x]) )
-    for i in futures:
-        distances.append(( trainingSety[x] , i.result() ))
-    #for x in range(len(trainingSetx)):
-        #distances.append( ( trainingSety[x] , manhattanDistance(testInstance,trainingSetx[x]) ) ) # tuple ( training example y, distance from test example ) appended in distances
+    #futures=[]
+    #with ProcessPoolExecutor(8) as executor:
+        #for x in range(len(trainingSetx)):
+            #futures.append(executor.submit(manhattanDistance, testInstance,trainingSetx[x]) )
+    #for i in futures:
+        #distances.append(( trainingSety[x] , i.result() ))
+    for x in range(len(trainingSetx)):
+        distances.append( ( trainingSety[x] , manhattanDistance(testInstance,trainingSetx[x]) ) ) # tuple ( training example y, distance from test example ) appended in distances
 
     distances.sort(key=operator.itemgetter(1))  #sort by distance ascending
     neighbors=[x[0] for x in distances[:k]]    #for best k, remove distance values, ie, append training example y to neighbours
@@ -111,16 +111,16 @@ def main():
     direc=os.fsencode('.')  #encode current directory
 
     inittime=time.time()
-    #filenames=[]
+    filenames=[]
     #filenames=['cat2.csv','cat2_r1.csv','cat2_r2.csv','cat2_r3.csv']
     #for filename in filenames:
     for File in os.listdir(direc):  #each file in directory
         filename=os.fsdecode(File)  #get filename
         if filename.endswith('.csv'):
-            #filenames.append(filename)
-            runkNN(filename)
-    #with ProcessPoolExecutor() as executor:
-        #executor.map(runkNN,filenames)
+            filenames.append(filename)
+            #runkNN(filename)
+    with ProcessPoolExecutor() as executor:
+        executor.map(runkNN,filenames)
 
     print('Total time elapsed:', time.time()-inittime)
 
