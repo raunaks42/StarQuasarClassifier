@@ -37,7 +37,7 @@ def loadDataset(filename, crossVal=False):
 def main():
     inittime = time.time()
 
-    filenames = ['cat2.csv', 'cat2_r1.csv', 'cat2_r3.csv', 'cat2_r2.csv']
+    filenames = ['cat2.csv', 'cat2_r1.csv', 'cat2_r3.csv']  #will not work for files which have only 1 class
     for filename in filenames:
         if filename.endswith('.csv'):
             totSetx, totSety = loadDataset(filename)
