@@ -37,8 +37,10 @@ def loadDataset(filename, crossVal=False):
 def main():
     inittime = time.time()
 
-    filenames = ['cat2.csv', 'cat2_r1.csv', 'cat2_r3.csv']  #will not work for files which have only 1 class
+    filenames = ['cat3.csv', 'cat3_correct_r1.csv',
+                 'cat3_correct_r3.csv', 'cat3_r1.csv', 'cat3_r3.csv']
     for filename in filenames:
+        start = time.time()
         if filename.endswith('.csv'):
             totSetx, totSety = loadDataset(filename)
             trainingSetx, testSetx, trainingSety, testSety = train_test_split(
@@ -51,7 +53,16 @@ def main():
 
             y_pred = svclassifier.predict(testSetx)
 
-            print(f1_score(testSety, y_pred, average='weighted')*100, end='\n')
+            print('accuracy = ',f1_score(testSety, y_pred, average='weighted')*100, end='\n')
+
+            # print('Current time elapsed:', time.time()-inittime, '\n\n')
+            stop = time.time()
+
+            duration = stop - start
+            
+            print("Duration for this file: ", duration, '\n')
+
+
 
     print('Total time elapsed:', time.time()-inittime)
 
